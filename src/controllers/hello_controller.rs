@@ -1,5 +1,4 @@
-
-use actix_web::{get, Responder, web, HttpResponse};
+use actix_web::{get, web, HttpResponse, Responder};
 use yew::ServerRenderer;
 
 use crate::views::components::hello::{Hello, HelloProps};
@@ -7,8 +6,6 @@ use crate::views::components::hello::{Hello, HelloProps};
 #[get("/{name}")]
 async fn index(name: web::Path<String>) -> impl Responder {
     let name = name.into_inner();
-    let renderer = ServerRenderer::<Hello>::with_props(HelloProps {
-        name
-    });
+    let renderer = ServerRenderer::<Hello>::with_props(HelloProps { name });
     HttpResponse::Ok().body(renderer.render().await)
 }
