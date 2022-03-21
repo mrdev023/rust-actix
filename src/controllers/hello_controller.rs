@@ -2,7 +2,7 @@
 use actix_web::{get, Responder, web, HttpResponse};
 use yew::ServerRenderer;
 
-use crate::front::components::hello::{Hello, HelloProps};
+use crate::views::components::hello::{Hello, HelloProps};
 
 #[get("/{name}")]
 async fn index(name: web::Path<String>) -> impl Responder {

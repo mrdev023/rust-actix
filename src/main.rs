@@ -1,5 +1,5 @@
 pub(self) mod controllers;
-pub(self) mod front;
+pub(self) mod views;
 
 use actix_web::{App, HttpServer, web};
 
