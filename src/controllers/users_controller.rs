@@ -7,17 +7,12 @@ use crate::{
         user::{UserComponent, UserComponentProps},
         users::{UsersComponent, UsersComponentProps},
     },
-    DbPool,
+    DbPool, controllers::run_query,
 };
 
 #[get("")]
 async fn index(pool: web::Data<DbPool>) -> Result<HttpResponse, Error> {
-    let users = web::block(move || {
-        let conn = pool.get()?;
-        User::all(&conn)
-    })
-    .await?
-    .map_err(actix_web::error::ErrorInternalServerError)?;
+    let users = run_query(|conn| User::all(conn), &pool).await?;
 
     let renderer = ServerRenderer::<UsersComponent>::with_props(UsersComponentProps {
         users: users.clone(),
@@ -32,12 +27,7 @@ async fn create(pool: web::Data<DbPool>) -> Result<HttpResponse, Error> {
     });
 
     let u = user.clone();
-    web::block(move || {
-        let conn = pool.get()?;
-        u.insert(&conn)
-    })
-    .await?
-    .map_err(actix_web::error::ErrorInternalServerError)?;
+    run_query(|conn| u.insert(conn), &pool).await?;
 
     let renderer =
         ServerRenderer::<UserComponent>::with_props(UserComponentProps { user: user.clone() });

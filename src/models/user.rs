@@ -1,10 +1,8 @@
-use diesel::prelude::*;
+use diesel::{prelude::*, result::QueryResult};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::schema::users;
-
-use super::DbError;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, AsChangeset, PartialEq)]
 pub struct User {
@@ -25,40 +23,33 @@ impl User {
         }
     }
 
-    pub fn all(conn: &SqliteConnection) -> Result<Vec<Self>, DbError> {
-        users::table.load::<Self>(conn).map_err(Into::into)
+    pub fn all(conn: &SqliteConnection) -> QueryResult<Vec<Self>> {
+        users::table.load(conn)
     }
 
-    pub fn find_by_id(conn: &SqliteConnection, id: String) -> Result<Self, DbError> {
+    pub fn find_by_id(conn: &SqliteConnection, id: String) -> QueryResult<Self> {
         users::table
             .filter(users::id.eq(id))
-            .first::<Self>(conn)
-            .map_err(Into::into)
+            .first(conn)
     }
 
-    pub fn insert(&self, conn: &SqliteConnection) -> Result<(), DbError> {
+    pub fn insert(&self, conn: &SqliteConnection) -> QueryResult<usize> {
         use crate::schema::users::dsl::*;
 
-        diesel::insert_into(users).values(self).execute(conn)?;
-
-        Ok(())
+        diesel::insert_into(users).values(self).execute(conn)
     }
 
-    pub fn update(&self, conn: &SqliteConnection) -> Result<(), DbError> {
+    pub fn update(&self, conn: &SqliteConnection) -> QueryResult<usize> {
         use crate::schema::users::dsl::*;
 
         diesel::update(users.find(self.id.clone()))
             .set(self)
-            .execute(conn)?;
-
-        Ok(())
+            .execute(conn)
     }
 
-    pub fn delete(&self, conn: &SqliteConnection) -> Result<(), DbError> {
+    pub fn delete(&self, conn: &SqliteConnection) -> QueryResult<usize> {
         use crate::schema::users::dsl::*;
 
-        diesel::delete(users.filter(id.eq(self.id.clone()))).execute(conn)?;
-
-        Ok(())
+        diesel::delete(users.filter(id.eq(self.id.clone()))).execute(conn)
     }
 }
