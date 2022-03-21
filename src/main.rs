@@ -30,9 +30,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .wrap(middleware::Logger::default())
-            .service(web::scope("/hello").service(controllers::hello_controller::index))
-            .service(web::scope("/users").service(controllers::users_controller::index))
-            .service(web::scope("/user").service(controllers::users_controller::create))
+            .configure(controllers::init_routes)
     })
     .bind(("127.0.0.1", 8000))?
     .run()

@@ -5,7 +5,7 @@ use crate::{
     models::user::{NewUser, User},
     views::components::{
         user::{UserComponent, UserComponentProps},
-        users::{UsersComponent, UsersComponentProps}
+        users::{UsersComponent, UsersComponentProps},
     },
     DbPool,
 };
@@ -19,12 +19,13 @@ async fn index(pool: web::Data<DbPool>) -> Result<HttpResponse, Error> {
     .await?
     .map_err(actix_web::error::ErrorInternalServerError)?;
 
-    let renderer =
-        ServerRenderer::<UsersComponent>::with_props(UsersComponentProps { users: users.clone() });
+    let renderer = ServerRenderer::<UsersComponent>::with_props(UsersComponentProps {
+        users: users.clone(),
+    });
     Ok(HttpResponse::Ok().body(renderer.render().await))
 }
 
-#[get("")]
+#[get("create")]
 async fn create(pool: web::Data<DbPool>) -> Result<HttpResponse, Error> {
     let user = User::new(NewUser {
         name: "John".to_string(),
@@ -41,4 +42,8 @@ async fn create(pool: web::Data<DbPool>) -> Result<HttpResponse, Error> {
     let renderer =
         ServerRenderer::<UserComponent>::with_props(UserComponentProps { user: user.clone() });
     Ok(HttpResponse::Ok().body(renderer.render().await))
+}
+
+pub fn init_routes(cfg: &mut web::ServiceConfig) {
+    cfg.service(web::scope("/users").service(index).service(create));
 }

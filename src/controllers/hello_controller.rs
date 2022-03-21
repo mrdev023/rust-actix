@@ -9,3 +9,7 @@ async fn index(name: web::Path<String>) -> impl Responder {
     let renderer = ServerRenderer::<Hello>::with_props(HelloProps { name });
     HttpResponse::Ok().body(renderer.render().await)
 }
+
+pub fn init_routes(cfg: &mut web::ServiceConfig) {
+    cfg.service(web::scope("/hello").service(index));
+}
