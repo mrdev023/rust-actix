@@ -27,25 +27,26 @@ impl User {
         users::table.load(conn)
     }
 
-    pub fn find_by_id(conn: &SqliteConnection, id: String) -> QueryResult<Self> {
+    pub fn find_by_id(conn: &SqliteConnection, id: &String) -> QueryResult<Self> {
         users::table
             .filter(users::id.eq(id))
             .first(conn)
     }
 
-    pub fn insert(&self, conn: &SqliteConnection) -> QueryResult<Self> {
-        use crate::schema::users::dsl::*;
+    pub fn create(conn: &SqliteConnection, new_user: &NewUser) -> QueryResult<Self> {
+        let user = User::new(new_user.clone());
+        diesel::insert_into(users::table)
+            .values(&user)
+            .execute(conn)?;
 
-        diesel::insert_into(users).values(self).execute(conn)?;
-
-        Ok(self.clone())
+        Ok(user)
     }
 
-    pub fn update(&self, conn: &SqliteConnection) -> QueryResult<Self> {
+    pub fn update(&self, conn: &SqliteConnection, data: &User) -> QueryResult<Self> {
         use crate::schema::users::dsl::*;
 
         diesel::update(users.find(self.id.clone()))
-            .set(self)
+            .set(data)
             .execute(conn)?;
 
         Ok(self.clone())
