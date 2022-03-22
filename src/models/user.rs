@@ -33,23 +33,29 @@ impl User {
             .first(conn)
     }
 
-    pub fn insert(&self, conn: &SqliteConnection) -> QueryResult<usize> {
+    pub fn insert(&self, conn: &SqliteConnection) -> QueryResult<Self> {
         use crate::schema::users::dsl::*;
 
-        diesel::insert_into(users).values(self).execute(conn)
+        diesel::insert_into(users).values(self).execute(conn)?;
+
+        Ok(self.clone())
     }
 
-    pub fn update(&self, conn: &SqliteConnection) -> QueryResult<usize> {
+    pub fn update(&self, conn: &SqliteConnection) -> QueryResult<Self> {
         use crate::schema::users::dsl::*;
 
         diesel::update(users.find(self.id.clone()))
             .set(self)
-            .execute(conn)
+            .execute(conn)?;
+
+        Ok(self.clone())
     }
 
-    pub fn delete(&self, conn: &SqliteConnection) -> QueryResult<usize> {
+    pub fn delete(&self, conn: &SqliteConnection) -> QueryResult<Self> {
         use crate::schema::users::dsl::*;
 
-        diesel::delete(users.filter(id.eq(self.id.clone()))).execute(conn)
+        diesel::delete(users.filter(id.eq(self.id.clone()))).execute(conn)?;
+
+        Ok(self.clone())
     }
 }

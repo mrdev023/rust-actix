@@ -6,8 +6,6 @@ pub(self) mod models;
 pub(self) mod schema;
 pub(self) mod views;
 
-pub(self) type DbPool = r2d2::Pool<ConnectionManager<SqliteConnection>>;
-
 use actix_web::{middleware, web, App, HttpServer};
 use diesel::{
     r2d2::{self, ConnectionManager},
