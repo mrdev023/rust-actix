@@ -49,7 +49,7 @@ impl User {
             .set(data)
             .execute(conn)?;
 
-        Ok(self.clone())
+        Ok(data.clone())
     }
 
     pub fn delete(&self, conn: &SqliteConnection) -> QueryResult<Self> {
